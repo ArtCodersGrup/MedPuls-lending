@@ -28,7 +28,7 @@
   html{scroll-behavior:smooth}
   body{margin:0;background:var(--white);color:var(--g-900);
     font-family:Inter,-apple-system,"Segoe UI",Roboto,sans-serif;font-size:16px;line-height:1.5;
-    -webkit-font-smoothing:antialiased}
+    -webkit-font-smoothing:antialiased;overflow-x:hidden}
   img,svg{display:block;max-width:100%}
   a{color:inherit;text-decoration:none}
   :focus-visible{outline:none;box-shadow:0 0 0 3px rgba(13,148,136,.45);border-radius:var(--r-sm)}
@@ -72,12 +72,20 @@
   @media(min-width:1000px){.nav-links{display:flex}}
   .nav-right{display:flex;align-items:center;gap:12px}
   .lang{display:flex;background:rgba(255,255,255,.10);border-radius:var(--pill);padding:3px}
-  .lang button{border:0;background:transparent;color:rgba(255,255,255,.7);font:inherit;font-size:13px;
-    font-weight:600;padding:7px 13px;border-radius:var(--pill);cursor:pointer;min-height:34px;
+  .lang button{display:inline-flex;align-items:center;justify-content:center;border:0;background:transparent;
+    color:rgba(255,255,255,.7);font:inherit;font-size:13px;
+    font-weight:600;padding:7px 13px;border-radius:var(--pill);cursor:pointer;min-height:48px;
     transition:background .2s var(--ease),color .2s var(--ease)}
   .lang button[aria-pressed="true"]{background:var(--teal-400);color:var(--teal-900)}
   .nav .btn{display:none}
   @media(min-width:640px){.nav .btn{display:inline-flex}}
+  @media(max-width:479px){
+    .wrap{padding:0 16px}
+    .nav-in{gap:8px}
+    .brand{font-size:17px;gap:8px}
+    .brand .sub{display:none}
+    .lang button{padding:7px 9px}
+  }
 
   /* ---- hero ---- */
   .hero{position:relative;background:var(--teal-900);color:#fff;overflow:hidden}
@@ -85,8 +93,8 @@
     background:radial-gradient(closest-side,rgba(45,212,191,.20),transparent 70%);pointer-events:none}
   .hero::after{content:"";position:absolute;width:620px;height:620px;bottom:-360px;left:-180px;
     background:radial-gradient(closest-side,rgba(13,148,136,.28),transparent 70%);pointer-events:none}
-  .hero-in{position:relative;z-index:2;display:grid;gap:46px;align-items:center;padding:76px 0 88px}
-  @media(min-width:1000px){.hero-in{grid-template-columns:1fr 1.02fr;gap:56px;padding:100px 0 112px}}
+  .hero-in{position:relative;z-index:2;display:grid;gap:46px;align-items:center;padding-top:76px;padding-bottom:88px}
+  @media(min-width:1000px){.hero-in{grid-template-columns:1fr 1.02fr;gap:56px;padding-top:100px;padding-bottom:112px}}
   .hero .eyebrow{color:var(--teal-400)}
   .hero h1{margin:16px 0 18px}
   .hero h1 .hl{color:var(--teal-400)}
@@ -134,6 +142,11 @@
   .sec{padding:80px 0}
   .sec-head{max-width:680px;margin-bottom:46px}
   .sec-head h2{margin:12px 0 14px}
+
+  /* intro video */
+  .video-frame{position:relative;width:100%;max-width:900px;margin:0 auto;aspect-ratio:16/9;
+    border-radius:var(--r-xl);overflow:hidden;box-shadow:var(--shadow-lg);background:#04211F}
+  .video-frame video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
 
   /* two pillars */
   .pillars{display:grid;gap:22px}
@@ -352,6 +365,20 @@
     <path d="M0 42h430l18-22 14 40 16-52 15 52 12-18h180l18-22 14 40 16-52 15 52 12-18h625"
           stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
   </svg>
+</section>
+
+<!-- ================= INTRO VIDEO ================= -->
+<section class="sec" id="video">
+  <div class="wrap">
+    <div class="sec-head rv" style="max-width:680px;margin-left:auto;margin-right:auto;text-align:center">
+      <span class="eyebrow" data-i18n="vid.eyebrow">Video</span>
+      <h2 data-i18n="vid.h2">ShifoTop bilan qisqacha tanishing</h2>
+      <p class="lead" data-i18n="vid.lead">Muammo, yechim va taklifimiz — bir necha soniyalik videoda.</p>
+    </div>
+    <div class="video-frame rv">
+      <video src="shifotop-intro.mp4" poster="shifotop-intro-poster.jpg" controls playsinline preload="metadata"></video>
+    </div>
+  </div>
 </section>
 
 <!-- ================= TWO PILLARS ================= -->
@@ -638,7 +665,6 @@
       Shifo<span class="t">Top</span>
     </div>
     <nav class="foot-links">
-      <a href="/" data-i18n="foot.patients">Bemorlar uchun</a>
       <a href="#narx" data-i18n="nav.price">Narxlar</a>
       <a href="#" data-i18n="foot.privacy">Maxfiylik siyosati</a>
       <a href="mailto:klinika@shifotop.uz">klinika@shifotop.uz</a>
@@ -659,6 +685,8 @@ const I18N = {
     "mock.title":"Записи","mock.new":"3 новых","mock.t1":"Новые","mock.t2":"Подтверждено","mock.t3":"Выполнено",
     "mock.h1":"Время","mock.h2":"Пациент","mock.h3":"Услуга","mock.h4":"Статус",
     "mock.s1":"Осмотр","mock.s2":"Консультация","mock.s3":"Анализ крови","mock.s4":"Удаление зуба",
+    "vid.eyebrow":"Видео","vid.h2":"Коротко познакомьтесь с ShifoTop",
+    "vid.lead":"Проблема, решение и наше предложение — в коротком видео.",
     "pil.eyebrow":"Наши услуги","pil.h2":"Работаем по двум направлениям",
     "pil.lead":"Одно приводит пациентов, другое наводит порядок внутри. Результат виден, когда работают оба.",
     "pil.a.h":"Поток пациентов в приложении",
@@ -723,7 +751,7 @@ const I18N = {
     "form.note":"Отправляя заявку, вы соглашаетесь на связь с вами. Данные не передаются третьим лицам.",
     "form.ok":"Спасибо! Заявка принята — свяжемся с вами в ближайшее время.",
     "form.err":"Не удалось отправить заявку. Пожалуйста, позвоните по номеру выше или напишите в Telegram.",
-    "foot.patients":"Для пациентов","foot.privacy":"Политика конфиденциальности"
+    "foot.privacy":"Политика конфиденциальности"
   }
 };
 const UZ = {};
