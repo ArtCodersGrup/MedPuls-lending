@@ -1,0 +1,890 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ShifoTop — klinikangiz uchun bemorlar oqimi va avtomatlashtirish</title>
+<meta name="description" content="Bemorlar ilovadan yoziladi, navbatlar panelda avtomatlashadi. Sozlash, o'qitish va qo'llab-quvvatlash biz zimmamizda.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --teal-50:#F0FDFA; --teal-100:#CCFBF1; --teal-400:#2DD4BF;
+    --teal-600:#0D9488; --teal-700:#0F766E; --teal-800:#115E59; --teal-900:#0C302E;
+    --g-900:#0F172A; --g-700:#334155; --g-500:#64748B; --g-300:#CBD5E1;
+    --g-200:#E2E8F0; --g-100:#F1F5F9; --g-50:#F8FAFC; --white:#fff;
+    --success:#15803D; --success-bg:#DCFCE7;
+    --warn:#B45309; --warn-bg:#FEF3C7;
+    --danger:#B91C1C; --danger-bg:#FEE2E2;
+    --info:#1D4ED8; --info-bg:#DBEAFE;
+    --r-sm:6px; --r:8px; --r-lg:12px; --r-xl:20px; --pill:999px;
+    --shadow:0 1px 2px rgba(16,24,40,.06),0 1px 3px rgba(16,24,40,.10);
+    --shadow-lg:0 20px 24px -4px rgba(16,24,40,.10),0 8px 8px -4px rgba(16,24,40,.04);
+    --ease:cubic-bezier(.4,0,.2,1);
+    --ease-out:cubic-bezier(.16,1,.3,1);
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:var(--white);color:var(--g-900);
+    font-family:Inter,-apple-system,"Segoe UI",Roboto,sans-serif;font-size:16px;line-height:1.5;
+    -webkit-font-smoothing:antialiased}
+  img,svg{display:block;max-width:100%}
+  a{color:inherit;text-decoration:none}
+  :focus-visible{outline:none;box-shadow:0 0 0 3px rgba(13,148,136,.45);border-radius:var(--r-sm)}
+  .wrap{width:100%;max-width:1140px;margin:0 auto;padding:0 24px}
+  h1,h2,h3{margin:0;font-weight:700;letter-spacing:-.02em;line-height:1.15}
+  h1{font-size:clamp(32px,4.9vw,54px)}
+  h2{font-size:clamp(25px,3.3vw,38px)}
+  h3{font-size:18px;line-height:1.3}
+  p{margin:0}
+  .lead{font-size:clamp(16px,1.5vw,18.5px);color:var(--g-700);line-height:1.62}
+  .eyebrow{font-size:12px;font-weight:600;letter-spacing:.09em;text-transform:uppercase;color:var(--teal-700)}
+
+  /* ---- buttons ---- */
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:48px;
+    padding:0 24px;border-radius:var(--r);border:1px solid transparent;font:inherit;font-weight:600;
+    font-size:15px;cursor:pointer;transition:background .2s var(--ease),border-color .2s var(--ease),transform .2s var(--ease)}
+  .btn:active{transform:translateY(1px)}
+  .btn-primary{background:var(--teal-700);color:#fff}
+  .btn-primary:hover{background:var(--teal-800)}
+  .btn-light{background:#fff;color:var(--teal-900)}
+  .btn-light:hover{background:var(--teal-50)}
+  .btn-ghost{background:transparent;color:#fff;border-color:rgba(255,255,255,.35)}
+  .btn-ghost:hover{border-color:var(--teal-400);background:rgba(255,255,255,.07)}
+  .btn-out{background:#fff;color:var(--teal-700);border-color:var(--g-300)}
+  .btn-out:hover{border-color:var(--teal-600);background:var(--teal-50)}
+  .btn-lg{min-height:54px;padding:0 30px;font-size:16px}
+
+  /* ---- nav ---- */
+  .nav{position:sticky;top:0;z-index:60;background:rgba(12,48,46,.94);backdrop-filter:blur(12px);
+    border-bottom:1px solid rgba(255,255,255,.10)}
+  .nav-in{display:flex;align-items:center;justify-content:space-between;height:66px;gap:16px}
+  .brand{display:flex;align-items:center;gap:10px;font-weight:700;font-size:20px;color:#fff;letter-spacing:-.02em}
+  .brand .mark{width:34px;height:34px;border-radius:10px;flex:none;display:grid;place-items:center;
+    background:linear-gradient(180deg,var(--teal-400),var(--teal-600))}
+  .brand .t{color:var(--teal-400)}
+  .brand .sub{font-size:12px;font-weight:500;color:rgba(255,255,255,.55);
+    border-left:1px solid rgba(255,255,255,.2);padding-left:10px}
+  .nav-links{display:none;gap:26px;font-size:14px;font-weight:500;color:rgba(255,255,255,.75)}
+  .nav-links a{transition:color .2s var(--ease)}
+  .nav-links a:hover{color:var(--teal-400)}
+  @media(min-width:1000px){.nav-links{display:flex}}
+  .nav-right{display:flex;align-items:center;gap:12px}
+  .lang{display:flex;background:rgba(255,255,255,.10);border-radius:var(--pill);padding:3px}
+  .lang button{border:0;background:transparent;color:rgba(255,255,255,.7);font:inherit;font-size:13px;
+    font-weight:600;padding:7px 13px;border-radius:var(--pill);cursor:pointer;min-height:34px;
+    transition:background .2s var(--ease),color .2s var(--ease)}
+  .lang button[aria-pressed="true"]{background:var(--teal-400);color:var(--teal-900)}
+  .nav .btn{display:none}
+  @media(min-width:640px){.nav .btn{display:inline-flex}}
+
+  /* ---- hero ---- */
+  .hero{position:relative;background:var(--teal-900);color:#fff;overflow:hidden}
+  .hero::before{content:"";position:absolute;width:760px;height:760px;top:-320px;right:-200px;
+    background:radial-gradient(closest-side,rgba(45,212,191,.20),transparent 70%);pointer-events:none}
+  .hero::after{content:"";position:absolute;width:620px;height:620px;bottom:-360px;left:-180px;
+    background:radial-gradient(closest-side,rgba(13,148,136,.28),transparent 70%);pointer-events:none}
+  .hero-in{position:relative;z-index:2;display:grid;gap:46px;align-items:center;padding:76px 0 88px}
+  @media(min-width:1000px){.hero-in{grid-template-columns:1fr 1.02fr;gap:56px;padding:100px 0 112px}}
+  .hero .eyebrow{color:var(--teal-400)}
+  .hero h1{margin:16px 0 18px}
+  .hero h1 .hl{color:var(--teal-400)}
+  .hero .lead{color:rgba(255,255,255,.80)}
+  .hero-cta{display:flex;flex-wrap:wrap;gap:12px;margin-top:32px}
+  .hero-note{margin-top:18px;font-size:13.5px;color:rgba(255,255,255,.58);display:flex;align-items:center;gap:8px}
+
+  /* signature: ECG pulse that draws itself once on load */
+  .ecg{position:absolute;left:0;right:0;bottom:0;height:70px;z-index:1;color:var(--teal-400);opacity:.30}
+  .ecg path{stroke-dasharray:2400;stroke-dashoffset:2400;animation:draw 2.6s var(--ease-out) .3s forwards}
+  @keyframes draw{to{stroke-dashoffset:0}}
+
+  /* ---- browser mockup ---- */
+  .browser{background:#fff;border-radius:var(--r-lg);box-shadow:var(--shadow-lg);overflow:hidden}
+  .bbar{display:flex;align-items:center;gap:6px;padding:11px 14px;background:var(--g-100);border-bottom:1px solid var(--g-200)}
+  .dot{width:10px;height:10px;border-radius:50%;background:var(--g-300)}
+  .url{margin-left:10px;background:#fff;border:1px solid var(--g-200);border-radius:var(--pill);
+    font-size:11px;color:var(--g-500);padding:4px 12px}
+  .panel{display:grid;grid-template-columns:62px 1fr;min-height:296px}
+  .side{background:var(--teal-900);padding:14px 0;display:flex;flex-direction:column;align-items:center;gap:13px}
+  .side i{width:22px;height:22px;border-radius:6px;background:rgba(255,255,255,.15)}
+  .side i.on{background:var(--teal-400)}
+  .pmain{padding:16px;background:var(--g-50);min-width:0}
+  .pmain-h{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+  .pmain-h strong{font-size:14px}
+  .tabs{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap}
+  .tab{font-size:11px;font-weight:600;padding:5px 10px;border-radius:var(--pill);
+    background:#fff;border:1px solid var(--g-200);color:var(--g-500)}
+  .tab.on{background:var(--teal-700);border-color:var(--teal-700);color:#fff}
+  table{width:100%;border-collapse:collapse;background:#fff;border:1px solid var(--g-200);
+    border-radius:var(--r);overflow:hidden;font-size:12px}
+  thead th{background:var(--g-100);text-align:left;font-size:10px;letter-spacing:.05em;text-transform:uppercase;
+    color:var(--g-500);padding:9px 10px;font-weight:600}
+  tbody td{padding:10px;border-top:1px solid var(--g-200);color:var(--g-700)}
+  tbody td.nm{color:var(--g-900);font-weight:600}
+  .badge{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:var(--pill);
+    font-size:10.5px;font-weight:600;white-space:nowrap}
+  .b-new{background:var(--warn-bg);color:var(--warn)}
+  .b-ok{background:var(--success-bg);color:var(--success)}
+  .b-done{background:var(--info-bg);color:var(--info)}
+  .hide-sm{display:none}
+  @media(min-width:560px){.hide-sm{display:table-cell}}
+
+  /* ---- sections ---- */
+  .sec{padding:80px 0}
+  .sec-head{max-width:680px;margin-bottom:46px}
+  .sec-head h2{margin:12px 0 14px}
+
+  /* two pillars */
+  .pillars{display:grid;gap:22px}
+  @media(min-width:900px){.pillars{grid-template-columns:1fr 1fr;gap:26px}}
+  .pillar{border-radius:var(--r-xl);padding:34px;border:1px solid var(--g-200);background:#fff;
+    transition:border-color .25s var(--ease),transform .25s var(--ease),box-shadow .25s var(--ease)}
+  .pillar:hover{border-color:var(--teal-600);transform:translateY(-3px);box-shadow:var(--shadow-lg)}
+  .pillar-num{font-size:12px;font-weight:700;letter-spacing:.09em;color:var(--teal-600);margin-bottom:14px}
+  .pillar h3{font-size:23px;margin-bottom:12px}
+  .pillar > p{color:var(--g-700);font-size:15.5px;margin-bottom:20px}
+  .plist{list-style:none;margin:0;padding:0;display:grid;gap:11px}
+  .plist li{display:flex;gap:10px;font-size:15px;color:var(--g-700);line-height:1.5}
+  .plist svg{flex:none;margin-top:3px;color:var(--teal-600)}
+
+  /* steps */
+  .steps{display:grid;gap:26px;counter-reset:s}
+  @media(min-width:760px){.steps{grid-template-columns:repeat(2,1fr)}}
+  @media(min-width:1060px){.steps{grid-template-columns:repeat(4,1fr);gap:24px}}
+  .step{border-top:2px solid var(--g-200);padding-top:22px;transition:border-color .25s var(--ease)}
+  .step:hover{border-color:var(--teal-600)}
+  .step::before{counter-increment:s;content:counter(s,decimal-leading-zero);display:block;
+    font-size:13px;font-weight:700;color:var(--teal-600);letter-spacing:.06em;margin-bottom:11px}
+  .step h3{margin-bottom:7px;font-size:17px}
+  .step p{font-size:14.5px;color:var(--g-700)}
+
+  /* features */
+  .feat{display:grid;gap:20px}
+  @media(min-width:700px){.feat{grid-template-columns:repeat(2,1fr)}}
+  @media(min-width:1020px){.feat{grid-template-columns:repeat(3,1fr)}}
+  .fcard{border:1px solid var(--g-200);border-radius:var(--r-lg);padding:26px;background:#fff;
+    transition:border-color .25s var(--ease),transform .25s var(--ease)}
+  .fcard:hover{border-color:var(--teal-600);transform:translateY(-3px)}
+  .ficon{width:44px;height:44px;border-radius:var(--r);background:var(--teal-100);color:var(--teal-700);
+    display:grid;place-items:center;margin-bottom:16px}
+  .fcard h3{margin-bottom:7px}
+  .fcard p{font-size:14.5px;color:var(--g-700)}
+
+  /* offer facts */
+  .facts{background:var(--g-900);border-radius:var(--r-xl);padding:46px 30px;color:#fff}
+  .facts-grid{display:grid;gap:32px;text-align:center}
+  @media(min-width:760px){.facts-grid{grid-template-columns:repeat(4,1fr)}}
+  .fact .n{font-size:clamp(34px,4.4vw,46px);font-weight:700;letter-spacing:-.03em;color:var(--teal-400);line-height:1}
+  .fact .c{font-size:14px;color:rgba(255,255,255,.68);margin-top:10px;line-height:1.45}
+
+  /* pricing */
+  .plans{display:grid;gap:22px;align-items:start}
+  @media(min-width:900px){.plans{grid-template-columns:repeat(3,1fr)}}
+  .plan{border:1px solid var(--g-200);border-radius:var(--r-xl);padding:30px;background:#fff;position:relative;
+    transition:border-color .25s var(--ease),transform .25s var(--ease)}
+  .plan:hover{transform:translateY(-3px)}
+  .plan.best{border:2px solid var(--teal-600);box-shadow:var(--shadow-lg)}
+  .plan-tag{position:absolute;top:-13px;left:30px;background:var(--teal-700);color:#fff;font-size:11.5px;
+    font-weight:700;letter-spacing:.05em;text-transform:uppercase;padding:5px 12px;border-radius:var(--pill)}
+  .plan h3{font-size:19px;margin-bottom:6px}
+  .plan .desc{font-size:14px;color:var(--g-500);min-height:40px}
+  .plan .amt{font-size:34px;font-weight:700;letter-spacing:-.03em;margin:14px 0 2px}
+  .plan .amt span{font-size:15px;font-weight:500;color:var(--g-500);letter-spacing:0}
+  .plan .plist{margin:22px 0 26px}
+  .plan .btn{width:100%}
+
+  /* faq */
+  .faq{max-width:780px}
+  .faq details{border-bottom:1px solid var(--g-200)}
+  .faq summary{list-style:none;cursor:pointer;padding:20px 42px 20px 0;position:relative;font-weight:600;
+    font-size:17px;min-height:48px;display:flex;align-items:center}
+  .faq summary::-webkit-details-marker{display:none}
+  .faq summary::after{content:"";position:absolute;right:8px;top:50%;width:10px;height:10px;
+    border-right:2px solid var(--g-500);border-bottom:2px solid var(--g-500);
+    transform:translateY(-70%) rotate(45deg);transition:transform .22s var(--ease)}
+  .faq details[open] summary::after{transform:translateY(-30%) rotate(-135deg)}
+  .faq p{padding:0 0 22px;color:var(--g-700)}
+
+  /* contact */
+  .contact{display:grid;gap:26px;align-items:start}
+  @media(min-width:940px){.contact{grid-template-columns:.85fr 1.15fr;gap:34px}}
+  .founder{background:var(--teal-50);border:1px solid var(--teal-100);border-radius:var(--r-xl);padding:30px}
+  .f-top{display:flex;align-items:center;gap:14px;margin-bottom:18px}
+  .f-ava{width:60px;height:60px;border-radius:50%;flex:none;background:linear-gradient(160deg,var(--teal-400),var(--teal-700));
+    display:grid;place-items:center;color:#fff;font-weight:700;font-size:21px}
+  .f-name{font-weight:700;font-size:17px}
+  .f-role{font-size:13.5px;color:var(--g-500)}
+  .founder p{font-size:15px;color:var(--g-700);margin-bottom:20px}
+  .f-contact{display:grid;gap:10px}
+  .f-link{display:flex;align-items:center;gap:11px;background:#fff;border:1px solid var(--g-200);
+    border-radius:var(--r);padding:13px 15px;font-weight:600;font-size:15px;min-height:50px;
+    transition:border-color .2s var(--ease),transform .2s var(--ease)}
+  .f-link:hover{border-color:var(--teal-600);transform:translateX(3px)}
+  .f-link svg{color:var(--teal-700);flex:none}
+  .f-link small{display:block;font-size:11.5px;font-weight:500;color:var(--g-500)}
+
+  .form-card{background:var(--g-50);border:1px solid var(--g-200);border-radius:var(--r-xl);padding:32px}
+  .frow{display:grid;gap:16px}
+  @media(min-width:600px){.frow.two{grid-template-columns:1fr 1fr}}
+  .field{margin-bottom:16px}
+  .field label{display:block;font-size:13px;font-weight:600;color:var(--g-700);margin-bottom:7px}
+  .field input,.field select,.field textarea{width:100%;min-height:48px;padding:12px 14px;font:inherit;
+    font-size:15px;border:1px solid var(--g-300);border-radius:var(--r);background:#fff;color:var(--g-900);
+    transition:border-color .2s var(--ease),box-shadow .2s var(--ease)}
+  .field textarea{min-height:96px;resize:vertical}
+  .field input:hover,.field select:hover,.field textarea:hover{border-color:var(--g-500)}
+  .field input:focus,.field select:focus,.field textarea:focus{border-color:var(--teal-600);outline:none;
+    box-shadow:0 0 0 3px rgba(13,148,136,.32)}
+  .hint{font-size:12px;color:var(--g-500);margin-top:6px}
+  .form-note{font-size:12.5px;color:var(--g-500);margin-top:14px;line-height:1.5}
+  .ok-msg{display:none;background:var(--success-bg);color:var(--success);border-radius:var(--r);
+    padding:14px 16px;font-weight:600;font-size:14.5px;margin-top:14px}
+  .ok-msg.show{display:block}
+  .err-msg{display:none;background:var(--danger-bg);color:var(--danger);border-radius:var(--r);
+    padding:14px 16px;font-weight:600;font-size:14.5px;margin-top:14px}
+  .err-msg.show{display:block}
+  .hp{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
+  .btn[disabled]{opacity:.6;cursor:not-allowed}
+
+  /* footer */
+  footer{background:var(--teal-900);color:rgba(255,255,255,.62);padding:46px 0;font-size:14px;margin-top:80px}
+  .foot-in{display:flex;flex-wrap:wrap;gap:20px;align-items:center;justify-content:space-between}
+  .foot-links{display:flex;flex-wrap:wrap;gap:22px}
+  .foot-links a{transition:color .2s var(--ease)}
+  .foot-links a:hover{color:var(--teal-400)}
+
+  /* scroll reveal */
+  .rv{opacity:0;transform:translateY(18px);transition:opacity .6s var(--ease-out),transform .6s var(--ease-out)}
+  .rv.in{opacity:1;transform:none}
+
+  @media (prefers-reduced-motion:reduce){
+    *{animation:none!important;transition:none!important;scroll-behavior:auto!important}
+    .rv{opacity:1;transform:none}
+    .ecg path{stroke-dashoffset:0}
+  }
+</style>
+</head>
+<body>
+
+<!-- ================= NAV ================= -->
+<header class="nav">
+  <div class="wrap nav-in">
+    <a class="brand" href="#top">
+      <span class="mark" aria-hidden="true">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M3 12h4l1.5-6 3 12L13 12h8" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </span>
+      Shifo<span class="t">Top</span>
+      <span class="sub" data-i18n="nav.sub">Klinikalar</span>
+    </a>
+
+    <nav class="nav-links" aria-label="Menu">
+      <a href="#xizmat" data-i18n="nav.services">Xizmatlar</a>
+      <a href="#qanday" data-i18n="nav.how">Qanday ishlaydi</a>
+      <a href="#narx" data-i18n="nav.price">Narxlar</a>
+      <a href="#savol" data-i18n="nav.faq">Savollar</a>
+    </nav>
+
+    <div class="nav-right">
+      <div class="lang" role="group" aria-label="Til / Язык">
+        <button type="button" data-lang="uz" aria-pressed="true">UZ</button>
+        <button type="button" data-lang="ru" aria-pressed="false">RU</button>
+      </div>
+      <a class="btn btn-light" href="#aloqa" data-i18n="nav.cta">Bepul konsultatsiya</a>
+    </div>
+  </div>
+</header>
+
+<main id="top">
+
+<!-- ================= HERO ================= -->
+<section class="hero">
+  <div class="wrap hero-in">
+    <div>
+      <span class="eyebrow" data-i18n="hero.eyebrow">Klinikalar uchun</span>
+      <h1><span data-i18n="hero.h1a">Bemorlar oqimi va</span> <span class="hl" data-i18n="hero.h1b">avtomatlashtirish</span></h1>
+      <p class="lead" data-i18n="hero.lead">Klinikangizni ilovamizga joylashtiramiz — bemorlar sizni topadi va o'zi yoziladi. Navbat, jadval, yozishma va izohlar esa bitta panelda avtomatlashadi. Sozlash va o'qitish biz zimmamizda.</p>
+      <div class="hero-cta">
+        <a class="btn btn-primary btn-lg" href="#aloqa" data-i18n="hero.cta1">Bepul konsultatsiya olish</a>
+        <a class="btn btn-ghost btn-lg" href="#xizmat" data-i18n="hero.cta2">Xizmatlarni ko'rish</a>
+      </div>
+      <p class="hero-note">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.8"/><path d="m8.5 12.2 2.4 2.4 4.6-4.9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span data-i18n="hero.note">Dastlabki 30 kun bepul. Karta talab qilinmaydi.</span>
+      </p>
+    </div>
+
+    <div class="browser" role="img" aria-label="ShifoTop panel">
+      <div class="bbar">
+        <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+        <span class="url">panel.shifotop.uz</span>
+      </div>
+      <div class="panel">
+        <div class="side" aria-hidden="true"><i></i><i class="on"></i><i></i><i></i><i></i></div>
+        <div class="pmain">
+          <div class="pmain-h">
+            <strong data-i18n="mock.title">Buyurtmalar</strong>
+            <span class="badge b-new" data-i18n="mock.new">3 ta yangi</span>
+          </div>
+          <div class="tabs">
+            <span class="tab on" data-i18n="mock.t1">Yangi</span>
+            <span class="tab" data-i18n="mock.t2">Tasdiqlangan</span>
+            <span class="tab" data-i18n="mock.t3">Bajarilgan</span>
+          </div>
+          <table>
+            <thead><tr>
+              <th data-i18n="mock.h1">Vaqt</th><th data-i18n="mock.h2">Bemor</th>
+              <th class="hide-sm" data-i18n="mock.h3">Xizmat</th><th data-i18n="mock.h4">Holat</th>
+            </tr></thead>
+            <tbody>
+              <tr><td>10:30</td><td class="nm">Azizbek Karimov</td><td class="hide-sm" data-i18n="mock.s1">Tish ko'rigi</td><td><span class="badge b-new" data-i18n="mock.t1">Yangi</span></td></tr>
+              <tr><td>11:15</td><td class="nm">Nilufar Rasulova</td><td class="hide-sm" data-i18n="mock.s2">Konsultatsiya</td><td><span class="badge b-ok" data-i18n="mock.t2">Tasdiqlangan</span></td></tr>
+              <tr><td>12:00</td><td class="nm">Jasur Toshmatov</td><td class="hide-sm" data-i18n="mock.s3">Qon tahlili</td><td><span class="badge b-ok" data-i18n="mock.t2">Tasdiqlangan</span></td></tr>
+              <tr><td>09:00</td><td class="nm">Dilnoza Ergasheva</td><td class="hide-sm" data-i18n="mock.s4">Tish oldirish</td><td><span class="badge b-done" data-i18n="mock.t3">Bajarilgan</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <svg class="ecg" viewBox="0 0 1400 70" preserveAspectRatio="none" fill="none" aria-hidden="true">
+    <path d="M0 42h430l18-22 14 40 16-52 15 52 12-18h180l18-22 14 40 16-52 15 52 12-18h625"
+          stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+  </svg>
+</section>
+
+<!-- ================= TWO PILLARS ================= -->
+<section class="sec" id="xizmat">
+  <div class="wrap">
+    <div class="sec-head rv">
+      <span class="eyebrow" data-i18n="pil.eyebrow">Xizmatlarimiz</span>
+      <h2 data-i18n="pil.h2">Ikki yo'nalishda ishlaymiz</h2>
+      <p class="lead" data-i18n="pil.lead">Biri bemor olib keladi, ikkinchisi ichki ishni tartibga soladi. Ikkalasi birga ishlaganda natija ko'rinadi.</p>
+    </div>
+
+    <div class="pillars">
+      <article class="pillar rv">
+        <p class="pillar-num">01</p>
+        <h3 data-i18n="pil.a.h">Ilovada bemorlar oqimi</h3>
+        <p data-i18n="pil.a.p">Klinikangiz ShifoTop ilovasida profil oladi. Bemor yo'nalish, reyting va narx bo'yicha qidiradi, sizni topadi va to'g'ridan-to'g'ri navbatga yoziladi.</p>
+        <ul class="plist">
+          <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="m5 12.5 4.5 4.5L19 7.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span data-i18n="pil.a.1">To'liq profil: tavsif, xizmatlar, narxlar, shifokorlar, rasmlar</span></li>
+          <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="m5 12.5 4.5 4.5L19 7.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span data-i18n="pil.a.2">Qidiruv va xaritada ko'rinish</span></li>
+          <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="m5 12.5 4.5 4.5L19 7.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span data-i18n="pil.a.3">Bemor izohlari va reyting — javob yozish imkoni bilan</span></li>
+          <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="m5 12.5 4.5 4.5L19 7.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span data-i18n="pil.a.4">Navbat so'rovi 24/7 qabul qilinadi</span></li>
+        </ul>
+      </article>
+
+      <article class="pillar rv">
+        <p class="pillar-num">02</p>
+        <h3 data-i18n="pil.b.h">Klinikani avtomatlashtirish</h3>
+        <p data-i18n="pil.b.p">Panelni sizning ish tartibingizga sozlaymiz: shifokorlar, xizmatlar, jadval va narxlar. Xodimlaringizni o'qitamiz va ishga tushguningizcha yoningizda bo'lamiz.</p>
+        <ul class="plist">
+          <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="m5 12.5 4.5 4.5L19 7.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span data-i18n="pil.b.1">Panelni to'liq sozlab beramiz — siz noldan boshlamaysiz</span></li>
+          <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="m5 12.5 4.5 4.5L19 7.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span data-i18n="pil.b.2">Registratura xodimlari uchun amaliy o'quv</span></li>
+          <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="m5 12.5 4.5 4.5L19 7.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span data-i18n="pil.b.3">Telefon orqali kelgan navbatlarni ham panelga kiritish tartibi</span></li>
+          <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="m5 12.5 4.5 4.5L19 7.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span data-i18n="pil.b.4">Doimiy texnik qo'llab-quvvatlash</span></li>
+        </ul>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ================= HOW IT WORKS ================= -->
+<section class="sec" id="qanday" style="background:var(--g-50)">
+  <div class="wrap">
+    <div class="sec-head rv">
+      <span class="eyebrow" data-i18n="how.eyebrow">Qanday ishlaydi</span>
+      <h2 data-i18n="how.h2">Ishga tushish — to'rt qadam</h2>
+      <p class="lead" data-i18n="how.lead">Ko'p klinika bir hafta ichida to'liq ishlay boshlaydi. Texnik bilim talab qilinmaydi.</p>
+    </div>
+    <div class="steps">
+      <div class="step rv"><h3 data-i18n="how.1h">Ariza va suhbat</h3><p data-i18n="how.1p">Siz ariza qoldirasiz, biz qo'ng'iroq qilamiz. Klinikangiz qanday ishlashini o'rganamiz.</p></div>
+      <div class="step rv"><h3 data-i18n="how.2h">Sozlash</h3><p data-i18n="how.2p">Profil, shifokorlar, xizmatlar, narxlar va jadvalni biz kiritamiz.</p></div>
+      <div class="step rv"><h3 data-i18n="how.3h">O'quv</h3><p data-i18n="how.3p">Registratura xodimlaringizga panelda ishlashni amaliy ko'rsatamiz.</p></div>
+      <div class="step rv"><h3 data-i18n="how.4h">Ishga tushish</h3><p data-i18n="how.4p">Profilingiz ilovada ochiladi, birinchi navbatlar kela boshlaydi.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= FEATURES ================= -->
+<section class="sec">
+  <div class="wrap">
+    <div class="sec-head rv">
+      <span class="eyebrow" data-i18n="feat.eyebrow">Panel imkoniyatlari</span>
+      <h2 data-i18n="feat.h2">Klinikani boshqarish uchun kerak bo'lgani</h2>
+    </div>
+    <div class="feat">
+      <article class="fcard rv">
+        <div class="ficon"><svg width="21" height="21" viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="17" rx="2.5" stroke="currentColor" stroke-width="1.8"/><path d="M3 9h18M8 2.5v3M16 2.5v3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="m9 14 2 2 4-4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <h3 data-i18n="feat.1h">Buyurtmalar</h3><p data-i18n="feat.1p">Yangi, tasdiqlangan, bajarilgan va bekor qilinganlar alohida. Bir bosishda tasdiqlaysiz.</p>
+      </article>
+      <article class="fcard rv">
+        <div class="ficon"><svg width="21" height="21" viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="17" rx="2.5" stroke="currentColor" stroke-width="1.8"/><path d="M3 9h18M8 2.5v3M16 2.5v3M8 13h3M8 17h3M14 13h2M14 17h2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></div>
+        <h3 data-i18n="feat.2h">Shifokorlar jadvali</h3><p data-i18n="feat.2p">Ish vaqti, tanaffus, dam kunlari. Bo'sh vaqt bemorga shu asosda ko'rinadi.</p>
+      </article>
+      <article class="fcard rv">
+        <div class="ficon"><svg width="21" height="21" viewBox="0 0 24 24" fill="none"><path d="M20 15a3 3 0 0 1-3 3H8l-4 3V6a3 3 0 0 1 3-3h10a3 3 0 0 1 3 3z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg></div>
+        <h3 data-i18n="feat.3h">Bemor bilan yozishma</h3><p data-i18n="feat.3p">Savolga panelning o'zidan javob berasiz. Yozishma buyurtmaga bog'lanadi.</p>
+      </article>
+      <article class="fcard rv">
+        <div class="ficon"><svg width="21" height="21" viewBox="0 0 24 24" fill="none"><path d="m12 2 3 6.6 7 .9-5.1 4.8 1.3 7L12 18l-6.2 3.3 1.3-7L2 9.5l7-.9z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg></div>
+        <h3 data-i18n="feat.4h">Izoh va reyting</h3><p data-i18n="feat.4p">Izohlarni ko'rasiz va javob yozasiz. Reyting profilingizda bemorga ko'rinadi.</p>
+      </article>
+      <article class="fcard rv">
+        <div class="ficon"><svg width="21" height="21" viewBox="0 0 24 24" fill="none"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <h3 data-i18n="feat.5h">Xizmat va narxlar</h3><p data-i18n="feat.5p">Bemor yozilishdan oldin narxni ko'radi — ortiqcha savol kamayadi.</p>
+      </article>
+      <article class="fcard rv">
+        <div class="ficon"><svg width="21" height="21" viewBox="0 0 24 24" fill="none"><path d="M5 21V7l7-4 7 4v14" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M12 9v6M9 12h6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></div>
+        <h3 data-i18n="feat.6h">Klinika profili</h3><p data-i18n="feat.6p">Tavsif, yo'nalishlar, ish vaqti, manzil va rasmlar — bemor aynan shuni ko'radi.</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ================= OFFER FACTS ================= -->
+<section class="sec" style="padding-top:0">
+  <div class="wrap">
+    <div class="facts rv">
+      <div class="facts-grid">
+        <div class="fact"><div class="n" data-count="30" data-suffix="">0</div><p class="c" data-i18n="fact.1">kun bepul sinov muddati</p></div>
+        <div class="fact"><div class="n" data-count="24" data-suffix="/7">0</div><p class="c" data-i18n="fact.2">navbat so'rovi qabul qilinadi</p></div>
+        <div class="fact"><div class="n" data-count="1" data-suffix=" ▸">0</div><p class="c" data-i18n="fact.3">hafta ichida to'liq ishga tushasiz</p></div>
+        <div class="fact"><div class="n" data-count="0" data-suffix=" so'm">0</div><p class="c" data-i18n="fact.4">boshlang'ich sozlash to'lovi</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= PRICING ================= -->
+<section class="sec" id="narx" style="background:var(--g-50)">
+  <div class="wrap">
+    <div class="sec-head rv">
+      <span class="eyebrow" data-i18n="price.eyebrow">Narxlar</span>
+      <h2 data-i18n="price.h2">Oddiy va oldindan ma'lum</h2>
+      <p class="lead" data-i18n="price.lead">Yashirin to'lov yo'q. Sinov muddatida karta so'ralmaydi.</p>
+    </div>
+
+    <!-- NARXLAR: yakuniy tarif tasdiqlangach shu qiymatlarni yangilang -->
+    <div class="plans">
+      <div class="plan rv">
+        <h3 data-i18n="price.1h">Boshlang'ich</h3>
+        <p class="desc" data-i18n="price.1d">Yakka shifokor va kichik klinikalar uchun.</p>
+        <p class="amt">290 000 <span data-i18n="price.per">so'm / oyiga</span></p>
+        <ul class="plist">
+          <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="m5 12.5 4.5 4.5L19 7.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span data-i18n="price.1a">Ilovada klinika profili</span></li>
+          <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="m5 12.5 4.5 4.5L19 7.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span data-i18n="price.1b">Buyurtmalar va jadval</span></li>
+          <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="m5 12.5 4.5 4.5L19 7.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span data-i18n="price.1c">Izohlarga javob berish</span></li>
+          <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="m5 12.5 4.5 4.5L19 7.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span data-i18n="price.1d2">Cheklanmagan buyurtma</span></li>
+        </ul>
+        <a class="btn btn-out btn-lg" href="#aloqa" data-i18n="price.btn">Tanlash</a>
+      </div>
+
+      <div class="plan best rv">
+        <span class="plan-tag" data-i18n="price.tag">Ommabop</span>
+        <h3 data-i18n="price.2h">Biznes</h3>
+        <p class="desc" data-i18n="price.2d">Ko'p qatnovli klinikalar uchun — sozlash va o'quv bilan.</p>
+        <p class="amt">590 000 <span data-i18n="price.per">so'm / oyiga</span></p>
+        <ul class="plist">
+          <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="m5 12.5 4.5 4.5L19 7.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span data-i18n="price.2a">Start tarifidagi hammasi</span></li>
+          <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="m5 12.5 4.5 4.5L19 7.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span data-i18n="price.2b">Panelni to'liq sozlab beramiz</span></li>
+          <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="m5 12.5 4.5 4.5L19 7.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span data-i18n="price.2c">Xodimlar uchun amaliy o'quv</span></li>
+          <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="m5 12.5 4.5 4.5L19 7.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span data-i18n="price.2d2">Ustuvor qo'llab-quvvatlash</span></li>
+        </ul>
+        <a class="btn btn-primary btn-lg" href="#aloqa" data-i18n="price.btn2">Bepul boshlash</a>
+      </div>
+
+      <div class="plan rv">
+        <h3 data-i18n="price.3h">Premium</h3>
+        <p class="desc" data-i18n="price.3d">Yirik va bir nechta filialli klinikalar uchun.</p>
+        <p class="amt">1 190 000 <span data-i18n="price.per">so'm / oyiga</span></p>
+        <ul class="plist">
+          <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="m5 12.5 4.5 4.5L19 7.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span data-i18n="price.3a">Biznes tarifidagi hammasi</span></li>
+          <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="m5 12.5 4.5 4.5L19 7.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span data-i18n="price.3b">Bir nechta filial boshqaruvi</span></li>
+          <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="m5 12.5 4.5 4.5L19 7.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span data-i18n="price.3c">Shaxsiy mas'ul menejer</span></li>
+          <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="m5 12.5 4.5 4.5L19 7.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span data-i18n="price.3d2">Talabga qarab kengaytirish</span></li>
+        </ul>
+        <a class="btn btn-out btn-lg" href="#aloqa" data-i18n="price.btn3">Bog'lanish</a>
+      </div>
+    </div>
+
+    <!-- shartnoma / kafolat bandi -->
+    <div class="rv" style="margin-top:26px;background:var(--teal-50);border:1px solid var(--teal-100);border-radius:var(--r-lg);padding:22px 24px;display:flex;flex-wrap:wrap;gap:18px;align-items:center;justify-content:space-between">
+      <div style="display:flex;gap:12px;align-items:flex-start;max-width:640px">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" style="flex:none;color:var(--teal-700);margin-top:2px" aria-hidden="true"><path d="M12 2 4 5v6c0 5 3.4 8.4 8 11 4.6-2.6 8-6 8-11V5l-8-3z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="m9 12 2 2 4-4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <p style="font-size:15px;color:var(--g-700);line-height:1.55" data-i18n="price.guarantee"><b style="color:var(--g-900)">Yillik shartnomada 2 oy bepul.</b> Boshlang'ich sozlash to'lovi yo'q, dastlabki 30 kun bepul. Natijadan qoniqmasangiz — istalgan vaqtda to'xtatasiz, jarima yo'q.</p>
+      </div>
+      <a class="btn btn-primary btn-lg" href="#aloqa" style="flex:none" data-i18n="price.cta">Shartnoma bo'yicha gaplashish</a>
+    </div>
+  </div>
+</section>
+
+<!-- ================= FAQ ================= -->
+<section class="sec" id="savol">
+  <div class="wrap">
+    <div class="sec-head rv">
+      <span class="eyebrow" data-i18n="faq.eyebrow">Savollar</span>
+      <h2 data-i18n="faq.h2">Klinikalar ko'p so'raydi</h2>
+    </div>
+    <div class="faq rv">
+      <details open><summary data-i18n="faq.1q">Ro'yxatdan o'tish qanday kechadi?</summary><p data-i18n="faq.1a">Klinika ma'lumotlari, litsenziya va aloqa raqamini kiritib ariza yuborasiz. Biz hujjatlarni tekshiramiz va tasdiqlaymiz — shundan keyin panelga kirasiz. Tekshiruv bemorlar uchun ishonchni ta'minlaydi.</p></details>
+      <details><summary data-i18n="faq.2q">Sozlash uchun texnik bilim kerakmi?</summary><p data-i18n="faq.2a">Yo'q. Biznes tarifida panelni biz to'liq sozlab beramiz va xodimlaringizni o'qitamiz. Sizdan faqat klinika ma'lumotlari kerak bo'ladi.</p></details>
+      <details><summary data-i18n="faq.3q">Mavjud dasturimiz bilan bog'lash mumkinmi?</summary><p data-i18n="faq.3a">Hozircha yo'q — ShifoTop mustaqil panel sifatida ishlaydi. Integratsiya talabini yozib boramiz va yo'l xaritamizda hisobga olamiz.</p></details>
+      <details><summary data-i18n="faq.4q">Telefon orqali kelgan navbatlar-chi?</summary><p data-i18n="faq.4a">Ularni ham panelga qo'lda kiritasiz. Shunda butun jadval bitta joyda bo'ladi va ustma-ust yozilish yuz bermaydi.</p></details>
+      <details><summary data-i18n="faq.5q">Yomon izohni o'chira olamizmi?</summary><p data-i18n="faq.5a">Yo'q — izohni faqat haqiqatan qabulda bo'lgan bemor qoldiradi va u o'chirilmaydi. Lekin siz ochiq javob yozishingiz mumkin. Qoidabuzarlik bo'lsa, izohni ko'rib chiqishga yuborasiz.</p></details>
+      <details><summary data-i18n="faq.6q">Sinov muddatidan keyin to'lash shartmi?</summary><p data-i18n="faq.6a">Yo'q. 30 kundan keyin davom ettirmasangiz, hisob to'xtaydi — avtomatik to'lov yechilmaydi. Karta ma'lumotini sinov uchun so'ramaymiz.</p></details>
+    </div>
+  </div>
+</section>
+
+<!-- ================= CONTACT ================= -->
+<section class="sec" id="aloqa" style="background:var(--g-50)">
+  <div class="wrap">
+    <div class="sec-head rv">
+      <span class="eyebrow" data-i18n="ct.eyebrow">Bog'lanish</span>
+      <h2 data-i18n="ct.h2">Keling, klinikangizni ko'rib chiqamiz</h2>
+      <p class="lead" data-i18n="ct.lead">Bepul konsultatsiya — 20 daqiqa. Klinikangiz uchun mos yechimni birga aniqlaymiz.</p>
+    </div>
+
+    <div class="contact">
+      <!-- ISM, RASM VA RAQAMNI O'ZINGIZNIKIGA ALMASHTIRING -->
+      <aside class="founder rv">
+        <div class="f-top">
+          <div class="f-ava" aria-hidden="true">B</div>
+          <div>
+            <p class="f-name">Boburshoh</p>
+            <p class="f-role" data-i18n="ct.role">ShifoTop asoschisi</p>
+          </div>
+        </div>
+        <p data-i18n="ct.msg">Har bir klinika bilan o'zim gaplashaman. Qanday ishlayotganingizni tushunmasdan turib yechim taklif qilmayman — avval savol beraman, keyin ko'rsataman.</p>
+        <div class="f-contact">
+          <a class="f-link" href="tel:+998900000000">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M21 16.5v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 1.1 3.7 2 2 0 0 1 3.1 1.5h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L7.1 9.4a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
+            <span><small data-i18n="ct.call">Qo'ng'iroq qiling</small>+998 90 000 00 00</span>
+          </a>
+          <a class="f-link" href="https://t.me/shifotop" target="_blank" rel="noopener">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M21.7 3.3 2.9 10.6c-1.1.4-1.1 1.1-.2 1.4l4.8 1.5 1.8 5.6c.2.6.4.9 1 .9.4 0 .6-.2.9-.5l2.3-2.2 4.8 3.5c.9.5 1.5.2 1.7-.8l3.1-14.6c.3-1.2-.5-1.8-1.4-1.4z"/></svg>
+            <span><small data-i18n="ct.tg">Telegram</small>@shifotop</span>
+          </a>
+        </div>
+      </aside>
+
+      <!-- FORMA: action manzilini o'z endpoint'ingizga almashtiring (Telegram bot / Formspree) -->
+      <div class="form-card rv">
+        <form id="leadForm" novalidate>
+          <div class="frow two">
+            <div class="field">
+              <label for="clinic" data-i18n="form.clinic">Klinika nomi</label>
+              <input id="clinic" name="clinic" type="text" autocomplete="organization" required>
+            </div>
+            <div class="field">
+              <label for="name" data-i18n="form.name">Ism-familiyangiz</label>
+              <input id="name" name="name" type="text" autocomplete="name" required>
+            </div>
+          </div>
+          <div class="frow two">
+            <div class="field">
+              <label for="phone" data-i18n="form.phone">Telefon raqami</label>
+              <input id="phone" name="phone" type="tel" autocomplete="tel" inputmode="tel" placeholder="+998 90 123 45 67" required>
+              <p class="hint" data-i18n="form.phoneHint">Ish vaqtida shu raqamga bog'lanamiz.</p>
+            </div>
+            <div class="field">
+              <label for="city" data-i18n="form.city">Shahar</label>
+              <select id="city" name="city">
+                <option>Toshkent</option><option>Samarqand</option><option>Farg'ona</option>
+                <option>Buxoro</option><option data-i18n="form.other">Boshqa</option>
+              </select>
+            </div>
+          </div>
+          <div class="field">
+            <label for="plan" data-i18n="form.interest">Qiziqtirgan xizmat</label>
+            <select id="plan" name="plan">
+              <option data-i18n="form.i1">Boshlang'ich tarif</option>
+              <option data-i18n="form.i2">Biznes tarifi</option>
+              <option data-i18n="form.i3">Premium (ko'p filial)</option>
+              <option data-i18n="form.i4">Hali aniq emas — maslahat kerak</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="msg" data-i18n="form.msg">Qo'shimcha izoh</label>
+            <textarea id="msg" name="msg" rows="3"></textarea>
+          </div>
+          <!-- spam filtri: odam bu maydonni ko'rmaydi, bot to'ldiradi -->
+          <div class="hp" aria-hidden="true">
+            <label for="website">Website</label>
+            <input id="website" name="website" type="text" tabindex="-1" autocomplete="off">
+          </div>
+
+          <button class="btn btn-primary btn-lg" id="submitBtn" type="submit" style="width:100%" data-i18n="form.submit">Ariza qoldirish</button>
+          <p class="form-note" data-i18n="form.note">Ariza yuborish orqali siz bilan bog'lanishimizga rozilik bildirasiz. Ma'lumotlaringiz uchinchi shaxsga berilmaydi.</p>
+          <p class="ok-msg" id="okMsg" data-i18n="form.ok">Rahmat! Arizangiz qabul qilindi — tez orada bog'lanamiz.</p>
+          <p class="err-msg" id="errMsg" data-i18n="form.err">Yuborishda xatolik yuz berdi. Iltimos, yuqoridagi raqamga qo'ng'iroq qiling yoki Telegram orqali yozing.</p>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+
+<!-- ================= FOOTER ================= -->
+<footer>
+  <div class="wrap foot-in">
+    <div class="brand" style="font-size:17px">
+      <span class="mark" style="width:28px;height:28px;border-radius:8px" aria-hidden="true">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M3 12h4l1.5-6 3 12L13 12h8" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </span>
+      Shifo<span class="t">Top</span>
+    </div>
+    <nav class="foot-links">
+      <a href="/" data-i18n="foot.patients">Bemorlar uchun</a>
+      <a href="#narx" data-i18n="nav.price">Narxlar</a>
+      <a href="#" data-i18n="foot.privacy">Maxfiylik siyosati</a>
+      <a href="mailto:klinika@shifotop.uz">klinika@shifotop.uz</a>
+    </nav>
+  </div>
+</footer>
+
+<script>
+/* ---------- i18n ---------- */
+const I18N = {
+  ru:{
+    "nav.sub":"Клиникам","nav.services":"Услуги","nav.how":"Как это работает","nav.price":"Цены",
+    "nav.faq":"Вопросы","nav.cta":"Бесплатная консультация",
+    "hero.eyebrow":"Для клиник","hero.h1a":"Поток пациентов и","hero.h1b":"автоматизация",
+    "hero.lead":"Мы размещаем вашу клинику в приложении — пациенты находят вас и записываются сами. Записи, расписание, переписка и отзывы автоматизируются в одной панели. Настройку и обучение берём на себя.",
+    "hero.cta1":"Получить консультацию","hero.cta2":"Смотреть услуги",
+    "hero.note":"Первые 30 дней бесплатно. Карта не требуется.",
+    "mock.title":"Записи","mock.new":"3 новых","mock.t1":"Новые","mock.t2":"Подтверждено","mock.t3":"Выполнено",
+    "mock.h1":"Время","mock.h2":"Пациент","mock.h3":"Услуга","mock.h4":"Статус",
+    "mock.s1":"Осмотр","mock.s2":"Консультация","mock.s3":"Анализ крови","mock.s4":"Удаление зуба",
+    "pil.eyebrow":"Наши услуги","pil.h2":"Работаем по двум направлениям",
+    "pil.lead":"Одно приводит пациентов, другое наводит порядок внутри. Результат виден, когда работают оба.",
+    "pil.a.h":"Поток пациентов в приложении",
+    "pil.a.p":"Ваша клиника получает профиль в приложении ShifoTop. Пациент ищет по направлению, рейтингу и цене, находит вас и записывается напрямую.",
+    "pil.a.1":"Полный профиль: описание, услуги, цены, врачи, фотографии",
+    "pil.a.2":"Видимость в поиске и на карте",
+    "pil.a.3":"Отзывы и рейтинг — с возможностью ответа",
+    "pil.a.4":"Заявки на запись принимаются круглосуточно",
+    "pil.b.h":"Автоматизация клиники",
+    "pil.b.p":"Настраиваем панель под ваш рабочий процесс: врачи, услуги, расписание и цены. Обучаем сотрудников и сопровождаем до полного запуска.",
+    "pil.b.1":"Полностью настраиваем панель — вы не начинаете с нуля",
+    "pil.b.2":"Практическое обучение для регистратуры",
+    "pil.b.3":"Порядок внесения записей, поступивших по телефону",
+    "pil.b.4":"Постоянная техническая поддержка",
+    "how.eyebrow":"Как это работает","how.h2":"Запуск — четыре шага",
+    "how.lead":"Большинство клиник начинают полноценно работать в течение недели. Технические знания не нужны.",
+    "how.1h":"Заявка и разговор","how.1p":"Вы оставляете заявку, мы звоним. Разбираемся, как устроена ваша клиника.",
+    "how.2h":"Настройка","how.2p":"Профиль, врачей, услуги, цены и расписание вносим мы.",
+    "how.3h":"Обучение","how.3p":"Показываем сотрудникам регистратуры работу в панели на практике.",
+    "how.4h":"Запуск","how.4p":"Профиль открывается в приложении, начинают поступать первые записи.",
+    "feat.eyebrow":"Возможности панели","feat.h2":"Всё, что нужно для управления клиникой",
+    "feat.1h":"Записи","feat.1p":"Новые, подтверждённые, выполненные и отменённые — раздельно. Подтверждение в один клик.",
+    "feat.2h":"Расписание врачей","feat.2p":"Рабочее время, перерывы, выходные. Свободное время показывается пациенту на этой основе.",
+    "feat.3h":"Переписка с пациентом","feat.3p":"Отвечаете прямо в панели. Переписка привязана к записи.",
+    "feat.4h":"Отзывы и рейтинг","feat.4p":"Видите отзывы и отвечаете на них. Рейтинг виден пациенту в профиле.",
+    "feat.5h":"Услуги и цены","feat.5p":"Пациент видит цену до записи — лишних вопросов становится меньше.",
+    "feat.6h":"Профиль клиники","feat.6p":"Описание, направления, часы работы, адрес и фото — пациент видит именно это.",
+    "fact.1":"дней бесплатного периода","fact.2":"приём заявок на запись",
+    "fact.3":"неделя до полного запуска","fact.4":"плата за первичную настройку",
+    "price.eyebrow":"Цены","price.h2":"Просто и заранее понятно",
+    "price.lead":"Скрытых платежей нет. В пробный период карта не требуется.",
+    "price.per":"сум / месяц","price.tag":"Популярный","price.btn":"Выбрать","price.btn2":"Начать бесплатно","price.btn3":"Связаться",
+    "price.1h":"Начальный","price.1d":"Для частных врачей и небольших клиник.",
+    "price.1a":"Профиль клиники в приложении","price.1b":"Записи и расписание",
+    "price.1c":"Ответы на отзывы","price.1d2":"Неограниченное число записей",
+    "price.2h":"Бизнес","price.2d":"Для клиник с потоком — с настройкой и обучением.",
+    "price.2a":"Всё из тарифа «Начальный»","price.2b":"Полностью настраиваем панель",
+    "price.2c":"Практическое обучение сотрудников","price.2d2":"Приоритетная поддержка",
+    "price.3h":"Премиум","price.3d":"Для крупных клиник и сети филиалов.","price.3amt":"По договорённости",
+    "price.3a":"Всё из тарифа «Бизнес»","price.3b":"Управление несколькими филиалами",
+    "price.3c":"Персональный менеджер","price.3d2":"Расширение под запрос",
+    "price.guarantee":"<b>При годовом договоре 2 месяца бесплатно.</b> Плата за первичную настройку отсутствует, первые 30 дней бесплатно. Если результат не устроит — отключаетесь в любой момент, без штрафов.",
+    "price.cta":"Обсудить договор",
+    "faq.eyebrow":"Вопросы","faq.h2":"О чём чаще всего спрашивают клиники",
+    "faq.1q":"Как проходит регистрация?","faq.1a":"Вы отправляете заявку с данными клиники, лицензией и контактным номером. Мы проверяем документы и подтверждаем — после этого вы получаете доступ к панели. Проверка обеспечивает доверие пациентов.",
+    "faq.2q":"Нужны ли технические знания для настройки?","faq.2a":"Нет. На тарифе «Бизнес» мы полностью настраиваем панель и обучаем ваших сотрудников. От вас нужны только данные клиники.",
+    "faq.3q":"Можно ли связать с нашей текущей программой?","faq.3a":"Пока нет — ShifoTop работает как самостоятельная панель. Запросы на интеграцию мы фиксируем и учитываем в дорожной карте.",
+    "faq.4q":"А записи, поступившие по телефону?","faq.4a":"Их вы вносите в панель вручную. Тогда всё расписание находится в одном месте и наложений не возникает.",
+    "faq.5q":"Можем ли мы удалить плохой отзыв?","faq.5a":"Нет — отзыв оставляет только пациент, который действительно был на приёме, и он не удаляется. Но вы можете написать публичный ответ. При нарушении правил отзыв отправляется на рассмотрение.",
+    "faq.6q":"Обязательно ли платить после пробного периода?","faq.6a":"Нет. Если через 30 дней вы не продолжаете, аккаунт останавливается — автосписания не происходит. Данные карты для пробного периода мы не запрашиваем.",
+    "ct.eyebrow":"Связаться","ct.h2":"Давайте разберём вашу клинику",
+    "ct.lead":"Бесплатная консультация — 20 минут. Вместе определим подходящее решение.",
+    "ct.role":"основатель ShifoTop",
+    "ct.msg":"С каждой клиникой я общаюсь лично. Не предлагаю решение, не поняв, как вы работаете — сначала задаю вопросы, потом показываю.",
+    "ct.call":"Позвонить","ct.tg":"Telegram",
+    "form.clinic":"Название клиники","form.name":"Ваше имя","form.phone":"Номер телефона",
+    "form.phoneHint":"Свяжемся по этому номеру в рабочее время.","form.city":"Город","form.other":"Другой",
+    "form.interest":"Что интересует","form.i1":"Начальный тариф",
+    "form.i2":"Бизнес тариф","form.i3":"Премиум (сеть филиалов)",
+    "form.i4":"Пока не решили — нужна консультация",
+    "form.msg":"Комментарий","form.submit":"Оставить заявку",
+    "form.note":"Отправляя заявку, вы соглашаетесь на связь с вами. Данные не передаются третьим лицам.",
+    "form.ok":"Спасибо! Заявка принята — свяжемся с вами в ближайшее время.",
+    "form.err":"Не удалось отправить заявку. Пожалуйста, позвоните по номеру выше или напишите в Telegram.",
+    "foot.patients":"Для пациентов","foot.privacy":"Политика конфиденциальности"
+  }
+};
+const UZ = {};
+document.querySelectorAll("[data-i18n]").forEach(el=>{
+  UZ[el.dataset.i18n] = (el.dataset.i18n === "price.guarantee") ? el.innerHTML : el.textContent;
+});
+
+let currentLang = "uz";
+
+function setLang(lang){
+  currentLang = (lang === "ru") ? "ru" : "uz";
+  const dict = lang === "ru" ? I18N.ru : UZ;
+  document.querySelectorAll("[data-i18n]").forEach(el=>{
+    const v = dict[el.dataset.i18n];
+    if(v){
+      if(el.dataset.i18n === "price.guarantee") el.innerHTML = v;
+      else el.textContent = v;
+    }
+  });
+  document.documentElement.lang = lang === "ru" ? "ru" : "uz";
+  document.querySelectorAll(".lang button").forEach(b=>{
+    b.setAttribute("aria-pressed", String(b.dataset.lang === lang));
+  });
+  try{ localStorage.setItem("st_lang", lang); }catch(e){}
+}
+document.querySelectorAll(".lang button").forEach(b=>{
+  b.addEventListener("click", ()=> setLang(b.dataset.lang));
+});
+try{
+  const saved = localStorage.getItem("st_lang");
+  if(saved === "ru") setLang("ru");
+}catch(e){}
+
+/* ---------- scroll reveal ---------- */
+const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+/* ---------- in-page anchor scroll (tugmalar/menyu) ---------- */
+document.querySelectorAll('a[href^="#"]').forEach(function(a){
+  a.addEventListener("click", function(e){
+    const id = this.getAttribute("href").slice(1);
+    if(!id) return;
+    const el = document.getElementById(id);
+    if(el){
+      e.preventDefault();
+      el.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" });
+      try { history.replaceState(null, "", "#" + id); } catch(_){ /* sandbox: e'tiborsiz */ }
+    }
+  });
+});
+if(!reduce && "IntersectionObserver" in window){
+  const io = new IntersectionObserver((entries)=>{
+    entries.forEach((e,i)=>{
+      if(e.isIntersecting){
+        e.target.style.transitionDelay = Math.min(i*70, 280) + "ms";
+        e.target.classList.add("in");
+        io.unobserve(e.target);
+      }
+    });
+  },{threshold:.14, rootMargin:"0px 0px -60px 0px"});
+  document.querySelectorAll(".rv").forEach(el=>io.observe(el));
+}else{
+  document.querySelectorAll(".rv").forEach(el=>el.classList.add("in"));
+}
+
+/* ---------- counters ---------- */
+function runCount(el){
+  const target = parseInt(el.dataset.count,10);
+  const suffix = el.dataset.suffix || "";
+  if(reduce){ el.textContent = target + suffix; return; }
+  const dur = 1100, t0 = performance.now();
+  function tick(now){
+    const p = Math.min((now-t0)/dur, 1);
+    const eased = 1 - Math.pow(1-p, 3);
+    el.textContent = Math.round(target*eased) + suffix;
+    if(p < 1) requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
+}
+if("IntersectionObserver" in window){
+  const co = new IntersectionObserver((entries)=>{
+    entries.forEach(e=>{ if(e.isIntersecting){ runCount(e.target); co.unobserve(e.target); } });
+  },{threshold:.5});
+  document.querySelectorAll("[data-count]").forEach(el=>co.observe(el));
+}else{
+  document.querySelectorAll("[data-count]").forEach(runCount);
+}
+
+/* ---------- form → Google Sheets ---------- */
+
+/* =============================================================
+   BU YERGA Apps Script Web App URL'ini qo'ying.
+   Olish: Apps Script → Deploy → New deployment → Web app
+          Execute as: Me | Who has access: Anyone
+   Ko'rinishi: https://script.google.com/macros/s/AKfyc.../exec
+   ============================================================= */
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwnDMukAD4V1fOA5jTkbmV3ufRteJawqHAhaS5xVPBe60C8n6UU4hj4yUOJla1jlUvnSw/exec";
+
+const MSG = {
+  uz:{ sending:"Yuborilmoqda..." },
+  ru:{ sending:"Отправляется..." }
+};
+
+async function sendLead(params){
+  const body = new URLSearchParams(params);
+
+  // 1-urinish: oddiy so'rov (javobni o'qiy olamiz)
+  try{
+    const r = await fetch(SCRIPT_URL, { method:"POST", body });
+    if(r.ok) return true;
+  }catch(_){ /* CORS to'sib qo'yishi mumkin — pastda qayta urinamiz */ }
+
+  // 2-urinish: no-cors (javob o'qilmaydi, lekin ma'lumot yetib boradi)
+  try{
+    await fetch(SCRIPT_URL, { method:"POST", mode:"no-cors", body });
+    return true;
+  }catch(_){ return false; }
+}
+
+document.getElementById("leadForm").addEventListener("submit", async function(ev){
+  ev.preventDefault();
+  const f  = ev.target;
+  const ok = document.getElementById("okMsg");
+  const er = document.getElementById("errMsg");
+  const btn = document.getElementById("submitBtn");
+
+  ok.classList.remove("show");
+  er.classList.remove("show");
+
+  // majburiy maydonlar
+  const req = [f.clinic, f.name, f.phone];
+  for(const el of req){
+    if(!el.value.trim()){ el.focus(); return; }
+  }
+
+  const btnText = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = MSG[currentLang].sending;
+
+  const sent = await sendLead({
+    clinic: f.clinic.value.trim(),
+    name:   f.name.value.trim(),
+    phone:  f.phone.value.trim(),
+    city:   f.city.value,
+    plan:   f.plan.value,
+    msg:    f.msg.value.trim(),
+    website:f.website.value,          // spam filtri
+    lang:   currentLang,
+    source: "lending-klinika"
+  });
+
+  btn.disabled = false;
+  btn.textContent = btnText;
+
+  if(sent){
+    ok.classList.add("show");
+    f.reset();
+    ok.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block:"center" });
+  }else{
+    er.classList.add("show");
+  }
+});
+</script>
+</body>
+</html>
