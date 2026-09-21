@@ -42,7 +42,7 @@ Lending **ShifoTop mobil ilovasining dizayn tiliga** qat'iy mos — foydalanuvch
 | `teal-700` | `#0F766E` | Tugma foni (oq matn bilan, WCAG AA) |
 | `teal-900` | `#0C302E` | Hero va footer to'q foni |
 | Shrift | **Inter** (400–700) | Barcha matn, `-0.02em` letter-spacing sarlavhalarda |
-| Grid | **8pt** | Spacing faqat: 4·8·12·16·24·32·48·64 px |
+| Grid | **8pt** | Bazaviy spacing qadamlari: 4·8·12·16·24·32·48·64 px (komponentga qarab boshqa oraliq qiymatlar ham uchraydi) |
 | Radius | `8px` (default), `12px` karta, `20px` katta blok | |
 | Motion | `cubic-bezier(0.4, 0, 0.2, 1)` · 200ms | Hover, o'tishlar |
 | Status ranglar | success `#15803D` · warning `#B45309` · danger `#B91C1C` | Holat piltalari (badge) |
@@ -95,8 +95,10 @@ Google Apps Script  (/exec endpoint)
 
 ```
 ShifoTop-lending/
-├── index.html    # butun lending: HTML + CSS + JS bitta faylda
-└── README.md     # shu hujjat
+├── index.html                    # butun lending: HTML + CSS + JS bitta faylda
+├── shifotop-intro.mp4            # tanishtiruv videosi (video bo'limida ishlatiladi)
+├── shifotop-intro-poster.jpg     # video uchun poster/preview rasmi
+└── README.md                     # shu hujjat
 ```
 
 Backend kodi (`.gs`) repo'da **saqlanmaydi** — u Google Apps Script muharririda turadi (token'lar shu yerda).

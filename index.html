@@ -25,10 +25,10 @@
     --ease-out:cubic-bezier(.16,1,.3,1);
   }
   *{box-sizing:border-box}
-  html{scroll-behavior:smooth}
+  html{scroll-behavior:smooth;overflow-x:hidden}
   body{margin:0;background:var(--white);color:var(--g-900);
     font-family:Inter,-apple-system,"Segoe UI",Roboto,sans-serif;font-size:16px;line-height:1.5;
-    -webkit-font-smoothing:antialiased;overflow-x:hidden}
+    -webkit-font-smoothing:antialiased}
   img,svg{display:block;max-width:100%}
   a{color:inherit;text-decoration:none}
   :focus-visible{outline:none;box-shadow:0 0 0 3px rgba(13,148,136,.45);border-radius:var(--r-sm)}
@@ -42,7 +42,7 @@
   .eyebrow{font-size:12px;font-weight:600;letter-spacing:.09em;text-transform:uppercase;color:var(--teal-700)}
 
   /* ---- buttons ---- */
-  .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:48px;
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:48px;min-width:0;
     padding:0 24px;border-radius:var(--r);border:1px solid transparent;font:inherit;font-weight:600;
     font-size:15px;cursor:pointer;transition:background .2s var(--ease),border-color .2s var(--ease),transform .2s var(--ease)}
   .btn:active{transform:translateY(1px)}
@@ -145,7 +145,7 @@
 
   /* intro video */
   .video-frame{position:relative;width:100%;max-width:900px;margin:0 auto;aspect-ratio:16/9;
-    border-radius:var(--r-xl);overflow:hidden;box-shadow:var(--shadow-lg);background:#04211F}
+    border-radius:var(--r-xl);overflow:hidden;box-shadow:var(--shadow-lg);background:var(--teal-900)}
   .video-frame video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
 
   /* two pillars */
@@ -370,7 +370,7 @@
 <!-- ================= INTRO VIDEO ================= -->
 <section class="sec" id="video">
   <div class="wrap">
-    <div class="sec-head rv" style="max-width:680px;margin-left:auto;margin-right:auto;text-align:center">
+    <div class="sec-head rv" style="margin-left:auto;margin-right:auto;text-align:center">
       <span class="eyebrow" data-i18n="vid.eyebrow">Video</span>
       <h2 data-i18n="vid.h2">ShifoTop bilan qisqacha tanishing</h2>
       <p class="lead" data-i18n="vid.lead">Muammo, yechim va taklifimiz — bir necha soniyalik videoda.</p>
@@ -543,7 +543,7 @@
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" style="flex:none;color:var(--teal-700);margin-top:2px" aria-hidden="true"><path d="M12 2 4 5v6c0 5 3.4 8.4 8 11 4.6-2.6 8-6 8-11V5l-8-3z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="m9 12 2 2 4-4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
         <p style="font-size:15px;color:var(--g-700);line-height:1.55" data-i18n="price.guarantee"><b style="color:var(--g-900)">Yillik shartnomada 2 oy bepul.</b> Boshlang'ich sozlash to'lovi yo'q, dastlabki 30 kun bepul. Natijadan qoniqmasangiz — istalgan vaqtda to'xtatasiz, jarima yo'q.</p>
       </div>
-      <a class="btn btn-primary btn-lg" href="#aloqa" style="flex:none" data-i18n="price.cta">Shartnoma bo'yicha gaplashish</a>
+      <a class="btn btn-primary btn-lg" href="#aloqa" data-i18n="price.cta">Shartnoma bo'yicha gaplashish</a>
     </div>
   </div>
 </section>
