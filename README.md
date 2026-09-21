@@ -8,13 +8,9 @@ Klinikalarni **ShifoTop** platformasiga jalb qilish uchun mo'ljallangan bir sahi
 
 ## 1. Loyiha haqida
 
-**ShifoTop** — O'zbekiston uchun tibbiy 2-tomonlama bozor (healthcare marketplace):
+**ShifoTop** — klinikalar uchun operatsion boshqaruv paneli (Clinic OS): registratura, shifokor qabuli, kassa, xodimlar, muolaja/in'eksiya kuzatuvi va rahbar hisobotlari — bitta panelda. Real modullar to'liq ro'yxati: `shifotop_crm` repozitoriyasidagi `backend/app/modules/*` (queue, visits, billing, patients, doctors, staff, followups, appointments, schedule, attendance, procedures, analytics, audit).
 
-- **Bemor (User)** — mobil ilovada klinika qidiradi, reyting va izohlarni ko'radi, navbatga yoziladi
-- **Klinika (Clinic)** — web panelda buyurtmalarni boshqaradi, bemor bilan yozishadi, jadval va narxlarni yuritadi
-- **Admin** — klinika arizalarini tekshiradi va tasdiqlaydi
-
-Platformaning yuragi — **buyurtma hayotiy sikli**: `YANGI → TASDIQLANGAN → BAJARILDI` (yoki `RAD / BEKOR / KELMADI`). Har holat o'zgarishi bemor va klinikaga avtomatik xabar yuboradi.
+Bemor mobil ilovasi orqali klinika qidirish/reyting/onlayn yozilish (marketpleys qatlami) **hozircha mustaqil rejalashtirilgan yo'nalish, bu repo doirasida qurilmagan** — buyurtma modelidagi `source=shifotop_booking` maydoni kelajakda shunday integratsiyaga tayyor, xolos. Landing ushbu haqiqatga mos ravishda faqat panelning real imkoniyatlarini sotadi.
 
 ## 2. Bu lendingning vazifasi
 
@@ -28,9 +24,11 @@ Sahifa → Forma (konsultatsiya so'rovi) → Qo'ng'iroq/Demo → Shartnoma
 
 Shuning uchun sahifadagi **har bir tugma formaga olib boradi** — "hoziroq sotib oling" emas, "gaplashaylik" mantiqidа.
 
-Sahifa ikkita taklifni yetkazadi:
-1. **Ilovada bemorlar oqimi** — klinika profili, qidiruvda ko'rinish, 24/7 navbat qabuli
-2. **Klinikani avtomatlashtirish** — panelni sozlash, xodimlarni o'qitish, qo'llab-quvvatlash (qamrov ataylab shu bilan cheklangan — tashqi tizimlarga integratsiya va'da qilinmaydi)
+Sahifa ikkita real qatlamni yetkazadi (CRM feature-inventarizatsiyasiga asoslangan, [`shifotop_crm`](https://github.com/ArtCodersGrup/shifotop_crm) kodi bilan tasdiqlangan):
+1. **Kundalik operatsiyalar** — navbat, qabul yozuvi, kassa, bemorlar bazasi (har bir tarifda bor, "Boshlang'ich"dan boshlab)
+2. **O'sish va nazorat** — oldindan yozuv, qayta aloqa, analitika, muolaja/in'eksiya nazorati, xodimlar davomati, audit jurnali ("Biznes" va "Premium" tariflarida bosqichma-bosqich ochiladi)
+
+Ko'p filial uchun bitta umumiy boshqaruv oynasi hali yo'q — har bir filial alohida obuna/panel bilan ishlaydi (batafsil: sahifadagi "Bir nechta filialimiz bo'lsa-chi?" savoli).
 
 ## 3. Dizayn tizimi
 
