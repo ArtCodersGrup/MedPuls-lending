@@ -1,6 +1,6 @@
 # MedPuls — Klinika Lending Sahifasi
 
-Klinikalarni **MedPuls** platformasiga jalb qilish uchun mo'ljallangan bir sahifali (single-page) lending. Ikki tilda (UZ/RU), forma orqali arizalar to'g'ridan-to'g'ri Google Sheets'ga tushadi va Telegram'ga darhol xabar keladi.
+Klinikalarni **MedPuls** platformasiga jalb qilish uchun mo'ljallangan bir sahifali (single-page) lending. Ikki tilda (UZ/RU), forma orqali arizalar to'g'ridan-to'g'ri MedPuls CRM backend'iga tushadi va Telegram'ga darhol xabar keladi.
 
 **Jonli sayt:** `https://artcodersgrup.github.io/ShifoTop-lending/`
 
@@ -64,30 +64,28 @@ Ataylab **framework'siz, build'siz** — bitta HTML fayl. Sabab: lending uchun R
 | **CSS3 (vanilla)** | Butun dizayn: CSS custom properties (design tokenlar), Grid/Flex layout, animatsiyalar (`@keyframes`, `transition`) |
 | **JavaScript (vanilla)** | 4 vazifa: i18n (UZ/RU lug'at almashtirish), scroll-reveal (`IntersectionObserver`), raqam hisoblagichlar, forma yuborish |
 | **Google Fonts (Inter)** | Yagona tashqi bog'liqlik — brend shrifti |
-| **Google Apps Script** | Backend qatlami: formadan POST qabul qiladi, Sheets'ga yozadi, Telegram'ga yuboradi. Serverless, bepul, token'larni yashiradi |
-| **Google Sheets** | Arizalar bazasi + oddiy CRM (Holat ustuni: Yangi → Qo'ng'iroq → Demo → Mijoz) |
-| **Telegram Bot API** | Yangi ariza haqida **darhol** xabar — Sheets bildirishnoma bermaydi, bu bo'shliqni yopadi |
+| **MedPuls CRM backend** (`POST /api/leads`) | Formadan so'rovni qabul qiladi, `leads` jadvaliga yozadi, Telegram'ga yuboradi. Google Sheets/Apps Script o'rnini bosadi — [`shifotop_crm`](https://github.com/ArtCodersGrup/shifotop_crm)ning `app/modules/leads/` moduli |
+| **Telegram Bot API** | Yangi ariza haqida **darhol** xabar — endi CRM backend tomonidan to'g'ridan-to'g'ri yuboriladi (`app/core/telegram.py`), Apps Script orqali emas |
 | **GitHub Pages** | Bepul static hosting, `git push` bilan yangilanadi |
 
 ### Arxitektura
 
 ```
 Brauzer (index.html)
-   │  fetch POST (FormData)
+   │  fetch POST (JSON)
    ▼
-Google Apps Script  (/exec endpoint)
-   ├─→ Google Sheets   — qator qo'shadi (telefon matn formatida, takror belgisi)
-   └─→ Telegram Bot    — asoschiga darhol xabar
+MedPuls CRM backend   (POST /api/leads, autentifikatsiyasiz ochiq endpoint)
+   ├─→ Postgres `leads` jadvali  — ariza saqlanadi (Yangi → Qo'ng'iroq → Demo → Mijoz)
+   └─→ Telegram Bot              — asoschiga darhol xabar (background task)
 ```
 
-**Nega Apps Script oraliq qatlam?** Telegram tokeni to'g'ridan-to'g'ri HTML'da tursa, sahifa manbasini ochgan har kim uni o'g'irlaydi. Apps Script tokenni Google serverida yashiradi — frontend faqat ochiq `/exec` URL'ni biladi.
+Arizalar CRM'ning platform-admin panelida (`/admin/leads`) ko'rinadi va boshqariladi — alohida Google Sheets'ga kirish shart emas.
 
 ### Frontend'dagi muhim detallar
 
 - **i18n** — barcha matn `data-i18n` atributi bilan belgilangan; UZ matnlar DOM'dan bazaviy lug'at sifatida o'qiladi, RU lug'ati JS'da. Tanlov `localStorage`'da saqlanadi.
-- **Forma himoyasi** — yashirin honeypot maydon (`website`): odam ko'rmaydi, bot to'ldiradi → Apps Script bunday arizani tashlab yuboradi.
-- **CORS fallback** — avval oddiy `fetch`, bloklansa `no-cors` rejimda qayta yuboriladi. Shu sababli haqiqiy muvaffaqiyat belgisi — Sheets'da qator paydo bo'lishi.
-- **Telefon `#ERROR!` muammosi** — `+998...` Sheets'da formula deb o'qilardi; backend raqam oldiga `'` qo'shadi va D ustuni matn (`@`) formatida.
+- **Forma himoyasi** — yashirin honeypot maydon (`website`): odam ko'rmaydi, bot to'ldiradi → backend bunday arizani jim tarzda tashlab yuboradi (baza yozuvi ham, Telegram xabari ham bo'lmaydi).
+- **CORS** — backend'ning `CORS_ORIGINS` sozlamasida shu sahifaning manzili (hozircha GitHub Pages, keyinchalik `medpuls.uz`) ro'yxatda bo'lishi shart, aks holda brauzer so'rovni bloklaydi.
 
 ## 5. Fayl tuzilishi
 
@@ -99,19 +97,18 @@ ShifoTop-lending/
 └── README.md                     # shu hujjat
 ```
 
-Backend kodi (`.gs`) repo'da **saqlanmaydi** — u Google Apps Script muharririda turadi (token'lar shu yerda).
+Backend kodi bu repo'da **saqlanmaydi** — u `shifotop_crm`ning o'z repozitoriyasida (`backend/app/modules/leads/`), token'lar CRM serverining `.env` faylida turadi.
 
 ## 6. Ishga tushirish
 
 ### Lokal ko'rish
-Faylni brauzerda ochish kifoya — server kerak emas.
+Faylni brauzerda ochish kifoya — server kerak emas. Forma yuborish uchun `LEADS_API_URL`ga ko'rsatilgan CRM backend ishlab turishi kerak (lokal test uchun `http://localhost:8000/api/leads`ga vaqtincha almashtiring).
 
-### Backend ulash (bir marta)
-1. Google Sheets yarating → ID'ni oling
-2. Apps Script'da backend kodini joylashtiring, `SHEET_ID`, `TG_TOKEN`, `TG_CHAT_ID` to'ldiring
-3. **Deploy → Web app** (`Execute as: Me`, `Access: Anyone`) → `/exec` URL oling
-4. `index.html`'dagi `SCRIPT_URL` o'zgaruvchisiga qo'ying
-5. Kod o'zgarsa — **qayta deploy** (Manage deployments → New version), aks holda eski versiya ishlaydi
+### Backend ulash (bir marta, CRM tomonida)
+1. `shifotop_crm` serverida `.env`ga `TELEGRAM_BOT_TOKEN` va `TELEGRAM_CHAT_ID` qo'shing (bot @BotFather orqali, chat ID — botni guruhga/kanalga qo'shib yoki shaxsiy xabar orqali olinadi)
+2. Backend'ning `CORS_ORIGINS`iga shu landing sahifaning manzilini qo'shing (masalan `https://artcodersgrup.github.io`, keyinchalik `https://medpuls.uz`)
+3. Backend qayta ishga tushiriladi (`systemctl restart shifotop-backend`)
+4. `index.html`'dagi `LEADS_API_URL`ni CRM'ning haqiqiy manziliga moslang
 
 ### Deploy (GitHub Pages)
 ```bash
@@ -123,12 +120,14 @@ Repo **Public** bo'lishi shart (bepul rejada). Settings → Pages → `main` / `
 
 ## 7. Ishga tushirishdan oldingi tekshiruv
 
-- [ ] `SCRIPT_URL` haqiqiy `/exec` havolaga almashtirilgan
+- [ ] `LEADS_API_URL` CRM'ning haqiqiy (domen ulangandan keyingi) manziliga almashtirilgan
+- [ ] Backend `CORS_ORIGINS`ida shu sahifaning manzili bor
+- [ ] Backend `.env`ida `TELEGRAM_BOT_TOKEN`/`TELEGRAM_CHAT_ID` sozlangan
 - [ ] Asoschi blokidagi telefon (`+998 90 000 00 00`) va Telegram (`@medpuls`) haqiqiy manzillarga almashtirilgan
 - [ ] Tarif narxlari tasdiqlangan (`class="amt"` qidiring)
-- [ ] Jonli domenda forma sinovdan o'tgan: Sheets'da qator **va** Telegram'da xabar keldi
+- [ ] Jonli domenda forma sinovdan o'tgan: CRM'ning `/admin/leads` sahifasida yozuv **va** Telegram'da xabar keldi
 - [ ] RU tugmasi bosib tekshirilgan — barcha bo'lim tarjima qilinadi
-- [ ] Sinov qatorlari Sheets'dan o'chirilgan
+- [ ] Sinov arizalari CRM'ning `/admin/leads` sahifasidan tozalangan (yoki e'tiborsiz qoldirilgan)
 
 ## 8. Yo'l xaritasi (lending doirasida)
 

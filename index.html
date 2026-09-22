@@ -843,34 +843,42 @@ if("IntersectionObserver" in window){
   document.querySelectorAll("[data-count]").forEach(runCount);
 }
 
-/* ---------- form → Google Sheets ---------- */
+/* ---------- form → MedPuls CRM (/api/leads) ---------- */
 
-/* =============================================================
-   BU YERGA Apps Script Web App URL'ini qo'ying.
-   Olish: Apps Script → Deploy → New deployment → Web app
-          Execute as: Me | Who has access: Anyone
-   Ko'rinishi: https://script.google.com/macros/s/AKfyc.../exec
-   ============================================================= */
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwnDMukAD4V1fOA5jTkbmV3ufRteJawqHAhaS5xVPBe60C8n6UU4hj4yUOJla1jlUvnSw/exec";
+/* TODO: swap for the real domain once medpuls.uz is connected to the CRM
+   server (docs/roadmap.md "Pilot deploy"). Whatever this page's own origin
+   is (this GitHub Pages URL today, medpuls.uz later) must be listed in the
+   backend's CORS_ORIGINS env var on the server, or the browser blocks the
+   request. */
+const LEADS_API_URL = "http://188.137.181.107:8080/api/leads";
 
 const MSG = {
   uz:{ sending:"Yuborilmoqda..." },
   ru:{ sending:"Отправляется..." }
 };
 
+function buildLeadMessage(city, planInterest, comment){
+  const parts = [];
+  if(city) parts.push(`Shahar: ${city}`);
+  if(planInterest) parts.push(`Qiziqtirgan xizmat: ${planInterest}`);
+  if(comment) parts.push(comment);
+  return parts.length ? parts.join("\n") : null;
+}
+
 async function sendLead(params){
-  const body = new URLSearchParams(params);
-
-  // 1-urinish: oddiy so'rov (javobni o'qiy olamiz)
   try{
-    const r = await fetch(SCRIPT_URL, { method:"POST", body });
-    if(r.ok) return true;
-  }catch(_){ /* CORS to'sib qo'yishi mumkin — pastda qayta urinamiz */ }
-
-  // 2-urinish: no-cors (javob o'qilmaydi, lekin ma'lumot yetib boradi)
-  try{
-    await fetch(SCRIPT_URL, { method:"POST", mode:"no-cors", body });
-    return true;
+    const r = await fetch(LEADS_API_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        clinic_name: params.clinic,
+        contact_name: params.name,
+        phone: params.phone,
+        message: buildLeadMessage(params.city, params.plan, params.msg),
+        website: params.website          // spam filtri (honeypot)
+      })
+    });
+    return r.ok;
   }catch(_){ return false; }
 }
 
@@ -901,9 +909,7 @@ document.getElementById("leadForm").addEventListener("submit", async function(ev
     city:   f.city.value,
     plan:   f.plan.value,
     msg:    f.msg.value.trim(),
-    website:f.website.value,          // spam filtri
-    lang:   currentLang,
-    source: "lending-klinika"
+    website:f.website.value          // spam filtri
   });
 
   btn.disabled = false;
