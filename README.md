@@ -1,6 +1,6 @@
-# ShifoTop — Klinika Lending Sahifasi
+# MedPuls — Klinika Lending Sahifasi
 
-Klinikalarni **ShifoTop** platformasiga jalb qilish uchun mo'ljallangan bir sahifali (single-page) lending. Ikki tilda (UZ/RU), forma orqali arizalar to'g'ridan-to'g'ri Google Sheets'ga tushadi va Telegram'ga darhol xabar keladi.
+Klinikalarni **MedPuls** platformasiga jalb qilish uchun mo'ljallangan bir sahifali (single-page) lending. Ikki tilda (UZ/RU), forma orqali arizalar to'g'ridan-to'g'ri Google Sheets'ga tushadi va Telegram'ga darhol xabar keladi.
 
 **Jonli sayt:** `https://artcodersgrup.github.io/ShifoTop-lending/`
 
@@ -8,13 +8,13 @@ Klinikalarni **ShifoTop** platformasiga jalb qilish uchun mo'ljallangan bir sahi
 
 ## 1. Loyiha haqida
 
-**ShifoTop** — klinikalar uchun operatsion boshqaruv paneli (Clinic OS): registratura, shifokor qabuli, kassa, xodimlar, muolaja/in'eksiya kuzatuvi va rahbar hisobotlari — bitta panelda. Real modullar to'liq ro'yxati: `shifotop_crm` repozitoriyasidagi `backend/app/modules/*` (queue, visits, billing, patients, doctors, staff, followups, appointments, schedule, attendance, procedures, analytics, audit).
+**MedPuls** — klinikalar uchun operatsion boshqaruv paneli (Clinic OS): registratura, shifokor qabuli, kassa, xodimlar, muolaja/in'eksiya kuzatuvi va rahbar hisobotlari — bitta panelda. Real modullar to'liq ro'yxati: `shifotop_crm` repozitoriyasidagi `backend/app/modules/*` (queue, visits, billing, patients, doctors, staff, followups, appointments, schedule, attendance, procedures, analytics, audit).
 
-Bemor mobil ilovasi orqali klinika qidirish/reyting/onlayn yozilish (marketpleys qatlami) **hozircha mustaqil rejalashtirilgan yo'nalish, bu repo doirasida qurilmagan** — buyurtma modelidagi `source=shifotop_booking` maydoni kelajakda shunday integratsiyaga tayyor, xolos. Landing ushbu haqiqatga mos ravishda faqat panelning real imkoniyatlarini sotadi.
+Bemor mobil ilovasi orqali klinika qidirish/reyting/onlayn yozilish (marketpleys qatlami) **hozircha mustaqil rejalashtirilgan yo'nalish, bu repo doirasida qurilmagan** — buyurtma modelidagi `source=medpuls_booking` maydoni kelajakda shunday integratsiyaga tayyor, xolos. Landing ushbu haqiqatga mos ravishda faqat panelning real imkoniyatlarini sotadi.
 
 ## 2. Bu lendingning vazifasi
 
-Bu sahifa **sotish sahifasi emas — ishonch tekshiruv nuqtasi**. Klinika egasi bizdan xabar olgach, "ShifoTop" deb qidiradi va shu sahifaga tushadi. Uning vazifasi bitta savolga javob berish: *"Bular haqiqiymi va vaqtimga arziydimi?"*
+Bu sahifa **sotish sahifasi emas — ishonch tekshiruv nuqtasi**. Klinika egasi bizdan xabar olgach, "MedPuls" deb qidiradi va shu sahifaga tushadi. Uning vazifasi bitta savolga javob berish: *"Bular haqiqiymi va vaqtimga arziydimi?"*
 
 Konversiya voronkasi:
 
@@ -32,7 +32,7 @@ Ko'p filial uchun bitta umumiy boshqaruv oynasi hali yo'q — har bir filial alo
 
 ## 3. Dizayn tizimi
 
-Lending **ShifoTop mobil ilovasining dizayn tiliga** qat'iy mos — foydalanuvchi ilovani ochganda bir xil brendni ko'rishi kerak.
+Lending **MedPuls mobil ilovasining dizayn tiliga** qat'iy mos — foydalanuvchi ilovani ochganda bir xil brendni ko'rishi kerak.
 
 | Token | Qiymat | Vazifasi |
 |---|---|---|
@@ -124,7 +124,7 @@ Repo **Public** bo'lishi shart (bepul rejada). Settings → Pages → `main` / `
 ## 7. Ishga tushirishdan oldingi tekshiruv
 
 - [ ] `SCRIPT_URL` haqiqiy `/exec` havolaga almashtirilgan
-- [ ] Asoschi blokidagi telefon (`+998 90 000 00 00`) va Telegram (`@shifotop`) haqiqiy manzillarga almashtirilgan
+- [ ] Asoschi blokidagi telefon (`+998 90 000 00 00`) va Telegram (`@medpuls`) haqiqiy manzillarga almashtirilgan
 - [ ] Tarif narxlari tasdiqlangan (`class="amt"` qidiring)
 - [ ] Jonli domenda forma sinovdan o'tgan: Sheets'da qator **va** Telegram'da xabar keldi
 - [ ] RU tugmasi bosib tekshirilgan — barcha bo'lim tarjima qilinadi
@@ -133,10 +133,10 @@ Repo **Public** bo'lishi shart (bepul rejada). Settings → Pages → `main` / `
 ## 8. Yo'l xaritasi (lending doirasida)
 
 - [ ] Bemor lendingini ochish (klinikalar yig'ilgach — bo'sh marketpleys bemorni qaytaradi)
-- [ ] `shifotop.uz` domenini ulash
+- [ ] `medpuls.uz` domenini ulash
 - [ ] Pilot natijalaridan keyin real raqamlar bilan ijtimoiy isbot qo'shish
 - [ ] Birinchi 5–10 qo'ng'iroqdan keyin RU/UZ nisbatini ko'rib, til strategiyasini aniqlash
 
 ---
 
-**Aloqa:** klinika@shifotop.uz · Telegram: @shifotop
+**Aloqa:** klinika@medpuls.uz · Telegram: @medpuls
