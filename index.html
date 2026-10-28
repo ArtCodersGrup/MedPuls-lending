@@ -845,12 +845,11 @@ if("IntersectionObserver" in window){
 
 /* ---------- form → MedPuls CRM (/api/leads) ---------- */
 
-/* TODO: swap for the real domain once medpuls.uz is connected to the CRM
-   server (docs/roadmap.md "Pilot deploy"). Whatever this page's own origin
-   is (this GitHub Pages URL today, medpuls.uz later) must be listed in the
-   backend's CORS_ORIGINS env var on the server, or the browser blocks the
-   request. */
-const LEADS_API_URL = "http://188.137.181.107:8080/api/leads";
+/* The CRM backend lives at crm.medpuls.uz (HTTPS). This page's own origin
+   (https://medpuls.uz, https://www.medpuls.uz, and the GitHub Pages URL) must
+   be listed in the backend's CORS_ORIGINS env var on the server, or the
+   browser blocks the request. */
+const LEADS_API_URL = "https://crm.medpuls.uz/api/leads";
 
 const MSG = {
   uz:{ sending:"Yuborilmoqda..." },
