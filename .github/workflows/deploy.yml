@@ -1,0 +1,73 @@
+# Statik sayt: tekshiruv -> main'ga push bo'lganda Hetzner'ga (Caddy file_server) avto-deploy.
+# Deploy kaliti serverda `command=` + `restrict` bilan cheklangan. Kerakli secrets: DEPLOY_HOST, DEPLOY_USER, DEPLOY_SSH_KEY, DEPLOY_KNOWN_HOSTS.
+name: Deploy
+
+on:
+  push:
+    branches: [main, 'ci/**']
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
+jobs:
+  check:
+    name: Tekshiruv
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v5
+      - name: Tekshiruv (index.html va lokal havolalar)
+        run: |
+          test -s index.html
+          grep -qi '<html' index.html
+          fail=0
+          for ref in $(grep -oE '(src|href)="[^"#?]+"' index.html | sed -E 's/^(src|href)="//; s/"$//' | grep -vE '^(https?:|mailto:|tel:|//|data:|javascript:)' | sort -u); do
+            [ -e "$ref" ] || { echo "YO'Q: $ref"; fail=1; }
+          done
+          exit $fail
+
+  deploy:
+    name: Serverga deploy
+    needs: check
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment: production
+    concurrency:
+      group: deploy-production
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@v5
+      - name: Arxivni tayyorlash
+        run: |
+          mkdir -p pkg/site
+          rsync -a --exclude='.git' --exclude='.github' --exclude='README.md' --exclude='CNAME' \
+                   --exclude='.build-report.md' --exclude='pkg' ./ pkg/site/
+
+      - name: SSH sozlash
+        env:
+          DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+          DEPLOY_KNOWN_HOSTS: ${{ secrets.DEPLOY_KNOWN_HOSTS }}
+        run: |
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "$DEPLOY_SSH_KEY" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          printf '%s\n' "$DEPLOY_KNOWN_HOSTS" > ~/.ssh/known_hosts
+
+      - name: Serverga yuborish
+        env:
+          DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
+          DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
+        run: |
+          # Server `command=` bilan faqat shu loyihaning deploy skriptini ishga tushiradi; "deploy" argumenti e'tiborsiz.
+          tar czf - -C pkg site | ssh -i ~/.ssh/deploy_key -o IdentitiesOnly=yes -o StrictHostKeyChecking=yes -o ServerAliveInterval=30 "$DEPLOY_USER@$DEPLOY_HOST" deploy
+      - name: Jonli tekshiruv (https://medpuls.uz/)
+        run: curl -fsS --retry 6 --retry-delay 5 -o /dev/null https://medpuls.uz/
+      - name: Kalitni o'chirish
+        if: always()
+        run: rm -f ~/.ssh/deploy_key
